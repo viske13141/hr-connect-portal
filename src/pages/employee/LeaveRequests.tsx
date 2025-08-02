@@ -261,15 +261,15 @@ export default function LeaveRequests() {
           </Card>
         </div>
 
-        {/* Leave Requests History */}
-        <Card>
+        {/* Current Leave Requests */}
+        <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Your Leave Requests</CardTitle>
-            <CardDescription>Track the status of your leave applications</CardDescription>
+            <CardTitle>Current Leave Requests</CardTitle>
+            <CardDescription>Your recent and pending leave applications</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {leaveRequests.map((request) => (
+              {leaveRequests.filter(request => request.status === 'pending' || new Date(request.startDate) >= new Date()).map((request) => (
                 <div key={request.id} className="border rounded-lg p-4">
                   <div className="flex justify-between items-start">
                     <div className="space-y-2">
@@ -292,6 +292,57 @@ export default function LeaveRequests() {
                   </div>
                 </div>
               ))}
+              
+              {leaveRequests.filter(request => request.status === 'pending' || new Date(request.startDate) >= new Date()).length === 0 && (
+                <div className="text-center py-8">
+                  <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No Current Leave Requests</h3>
+                  <p className="text-muted-foreground">You have no pending or upcoming leave requests</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Past Leave Requests */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Past Leave Requests</CardTitle>
+            <CardDescription>Your leave history and completed applications</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {leaveRequests.filter(request => request.status !== 'pending' && new Date(request.endDate) < new Date()).map((request) => (
+                <div key={request.id} className="border rounded-lg p-4 bg-muted/30">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <h4 className="font-semibold text-muted-foreground">{getLeaveTypeLabel(request.type)}</h4>
+                        <Badge className={getStatusColor(request.status)}>
+                          {getStatusIcon(request.status)}
+                          <span className="ml-1 capitalize">{request.status}</span>
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        <p><strong>Duration:</strong> {request.startDate} to {request.endDate} ({request.days} days)</p>
+                        <p><strong>Applied on:</strong> {request.appliedDate}</p>
+                        <p><strong>Reason:</strong> {request.reason}</p>
+                        {request.hrComments && (
+                          <p><strong>HR Comments:</strong> {request.hrComments}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {leaveRequests.filter(request => request.status !== 'pending' && new Date(request.endDate) < new Date()).length === 0 && (
+                <div className="text-center py-8">
+                  <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No Past Leave Requests</h3>
+                  <p className="text-muted-foreground">Your past leave requests will appear here</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

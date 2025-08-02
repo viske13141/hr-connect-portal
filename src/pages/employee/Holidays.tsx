@@ -64,6 +64,11 @@ export default function Holidays() {
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, 5);
 
+  const pastHolidays = holidays
+    .filter(holiday => new Date(holiday.date) < new Date())
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5);
+
   return (
     <DashboardLayout requiredRole="employee">
       <div className="space-y-6">
@@ -168,6 +173,42 @@ export default function Holidays() {
                       )}
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Past Holidays */}
+            <Card className="mt-4">
+              <CardHeader>
+                <CardTitle>Past Holidays</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {pastHolidays.map(holiday => (
+                    <div key={holiday.id} className="space-y-2 opacity-75">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium text-muted-foreground">{holiday.name}</h4>
+                        <Badge className={getHolidayTypeColor(holiday.type)}>
+                          {holiday.type}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(holiday.date).toLocaleDateString('en-US', { 
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                      {holiday.description && (
+                        <p className="text-xs text-muted-foreground">{holiday.description}</p>
+                      )}
+                    </div>
+                  ))}
+                  
+                  {pastHolidays.length === 0 && (
+                    <p className="text-center text-muted-foreground py-4">No past holidays to display</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
